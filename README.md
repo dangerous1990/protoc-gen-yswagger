@@ -1,4 +1,9 @@
-[TOC]
+- [what's this?](#what-s-this-)
+- [why?](#why-)
+- [how to use](#how-to-use)
+  * [安装protoc](#--protoc)
+  * [执行init.sh](#--initsh)
+  * [sample](#sample)
 
 # what's this?
 基于bilibili [kratos](https://github.com/bilibili/kratos)的protoc-gen-bswagger修改而来，通过proto文件生成restful的swagger.json文档
