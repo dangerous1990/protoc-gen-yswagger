@@ -11,8 +11,12 @@
 # why?
 对于生成的swagger.json有一些定制内容
 # how to use
-## 安装protoc 
+## 首先如果没有过protoc需要安装protoc 
 https://github.com/protocolbuffers/protobuf
+##
+```
+git clone https://github.com/dangerous1990/protoc-plugins.git
+```
 ## 执行init.sh
 ```
 ./init.sh
@@ -37,9 +41,9 @@ message HelloReply{
     string name =1;
 }
 ```
-- 生成swagger.json
+- 使用protoc生成swagger.json
 ```
-protoc -I$GOPATH/src/proto -Iexample example/hello.proto  --swagger_out=example
+protoc -I"${GOPATH}/src/proto" -Iexample example/hello.proto  --swagger_out=example
 
 ```
 
