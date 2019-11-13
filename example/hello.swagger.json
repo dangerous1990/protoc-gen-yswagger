@@ -1,0 +1,74 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "hello.proto",
+        "version": ""
+    },
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json",
+        "multipart/form-data"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/hello": {
+            "post": {
+                "summary": "hello",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.HelloReply"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/.HelloReq"
+                        }
+                    }
+                ],
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
+        }
+    },
+    "definitions": {
+        ".HelloReply": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        ".HelloReq": {
+            "type": "object",
+            "properties": {}
+        }
+    }
+}
