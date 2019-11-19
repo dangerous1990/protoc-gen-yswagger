@@ -16,7 +16,7 @@
 https://github.com/protocolbuffers/protobuf
 ## 2. clone当前项目
 ```
-git clone https://github.com/dangerous1990/protoc-plugins.git
+git clone github.com/dangerous1990/protoc-plugins.git
 ```
 ## 3. 执行init.sh
 进入protoc-plugins项目执行
