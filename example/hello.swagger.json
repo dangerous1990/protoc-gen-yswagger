@@ -16,7 +16,7 @@
         "application/json"
     ],
     "paths": {
-        "/hello": {
+        "/hello/:id": {
             "post": {
                 "summary": "hello",
                 "responses": {
@@ -49,6 +49,12 @@
                         "schema": {
                             "$ref": "#/definitions/.HelloReq"
                         }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "tags": [
@@ -68,7 +74,11 @@
         },
         ".HelloReq": {
             "type": "object",
-            "properties": {}
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
         }
     }
 }

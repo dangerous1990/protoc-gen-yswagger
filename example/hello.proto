@@ -5,16 +5,17 @@ service HelloWorld {
     // hello
     rpc Hello (HelloReq) returns (HelloReply) {
         option (google.api.http) = {
-            post:"/hello"
+            post:"/hello/:id"
         };
     };
 
 }
 
-message HelloReq{
+message HelloReq {
+    string id = 1;
 }
 
 
-message HelloReply{
-    string name =1;
+message HelloReply {
+    string name = 1;
 }
