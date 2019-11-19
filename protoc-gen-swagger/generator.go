@@ -144,6 +144,9 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 		def.Description = strings.Trim(msg.Comments.Leading, "\n\r ")
 		for _, field := range msg.Descriptor.Field {
 			p := keyVal{Key: generator.GetFormOrJSONName(field)}
+			if p.Key == "-"{
+				continue
+			}
 			schema := t.schemaForField(file, msg, field)
 			if generator.GetFieldRequired(field, t.Reg, msg) {
 				def.Required = append(def.Required, p.Key)
