@@ -16,6 +16,36 @@
         "application/json"
     ],
     "paths": {
+        "/echo": {
+            "post": {
+                "summary": "echo",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.EchoReply"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
+        },
         "/hello/:id": {
             "post": {
                 "summary": "hello",
@@ -64,6 +94,18 @@
         }
     },
     "definitions": {
+        ".EchoReply": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        ".EchoReq": {
+            "type": "object",
+            "properties": {}
+        },
         ".HelloReply": {
             "type": "object",
             "properties": {
@@ -76,9 +118,6 @@
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
-                },
-                "-": {
                     "type": "string"
                 }
             }

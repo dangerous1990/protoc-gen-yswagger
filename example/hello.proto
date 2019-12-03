@@ -10,8 +10,22 @@ service HelloWorld {
         };
     };
 
+    // echo
+    rpc Echo (EchoReq) returns (EchoReply) {
+        option (google.api.http) = {
+            post:"/echo"
+        };
+    };
+
+
 }
 
+message EchoReq {
+}
+
+message EchoReply {
+    string name =1;
+}
 message HelloReq {
     string id = 1;
     string name= 2 [(gogoproto.jsontag) = '-'];

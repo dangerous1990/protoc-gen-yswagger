@@ -96,13 +96,17 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 					op.Parameters = append(op.Parameters, p)
 				}
 			} else {
-				p := swaggerParameterObject{}
-				p.In = "body"
-				p.Required = true
-				p.Name = "body"
-				p.Schema = &swaggerSchemaObject{}
-				p.Schema.Ref = "#/definitions/" + meth.GetInputType()
-				op.Parameters = []swaggerParameterObject{p}
+				if len(request.Descriptor.Field) != 0 {
+					p := swaggerParameterObject{}
+					p.In = "body"
+					p.Required = true
+					p.Name = "body"
+					p.Schema = &swaggerSchemaObject{}
+					p.Schema.Ref = "#/definitions/" + meth.GetInputType()
+					op.Parameters = []swaggerParameterObject{p}
+				}else {
+					op.Parameters = []swaggerParameterObject{}
+				}
 			}
 			// support path parameters
 			isContainPathParameters, pathField := isContainPathParameters(apiInfo.Path)
@@ -144,7 +148,7 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 		def.Description = strings.Trim(msg.Comments.Leading, "\n\r ")
 		for _, field := range msg.Descriptor.Field {
 			p := keyVal{Key: generator.GetFormOrJSONName(field)}
-			if p.Key == "-"{
+			if p.Key == "-" {
 				continue
 			}
 			schema := t.schemaForField(file, msg, field)
@@ -249,7 +253,6 @@ func (t *swaggerGen) getPathParameter(file *descriptor.FileDescriptorProto,
 	}
 	return p
 }
-
 
 func (t *swaggerGen) schemaForField(file *descriptor.FileDescriptorProto,
 	msg *typemap.MessageDefinition,
