@@ -104,19 +104,20 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 					p.Schema = &swaggerSchemaObject{}
 					p.Schema.Ref = "#/definitions/" + meth.GetInputType()
 					op.Parameters = []swaggerParameterObject{p}
-				}else {
+				} else {
 					op.Parameters = []swaggerParameterObject{}
 				}
 			}
 			// support path parameters
 			isContainPathParameters, pathField := isContainPathParameters(apiInfo.Path)
 			if isContainPathParameters {
-				for _, field := range request.Descriptor.Field {
-					if strings.ToUpper(pathField) == strings.ToUpper(*field.Name) {
-						p := t.getPathParameter(file, request, field)
-						op.Parameters = append(op.Parameters, p)
-					}
-				}
+				p := swaggerParameterObject{}
+				p.In = "path"
+				p.Required = true
+				p.Name = pathField
+				p.Type = "string"
+				p.Schema = &swaggerSchemaObject{}
+				op.Parameters = append(op.Parameters, p)
 			}
 			// response
 			resp := swaggerResponseObject{}

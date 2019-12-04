@@ -35,7 +35,7 @@
                                     "type": "string"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/.EchoReply"
+                                    "$ref": "#/definitions/.example.EchoReply"
                                 }
                             }
                         }
@@ -65,7 +65,46 @@
                                     "type": "string"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/.HelloReply"
+                                    "$ref": "#/definitions/.example.HelloReply"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "schema": {}
+                    }
+                ],
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
+        },
+        "/token": {
+            "post": {
+                "summary": "Token",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.example.EchoReply"
                                 }
                             }
                         }
@@ -77,14 +116,8 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/.HelloReq"
+                            "$ref": "#/definitions/.example.TokenReq"
                         }
-                    },
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": false,
-                        "type": "string"
                     }
                 ],
                 "tags": [
@@ -94,7 +127,7 @@
         }
     },
     "definitions": {
-        ".EchoReply": {
+        ".example.EchoReply": {
             "type": "object",
             "properties": {
                 "name": {
@@ -102,11 +135,11 @@
                 }
             }
         },
-        ".EchoReq": {
+        ".example.EchoReq": {
             "type": "object",
             "properties": {}
         },
-        ".HelloReply": {
+        ".example.HelloReply": {
             "type": "object",
             "properties": {
                 "name": {
@@ -114,10 +147,25 @@
                 }
             }
         },
-        ".HelloReq": {
+        ".example.HelloReq": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.Token": {
             "type": "object",
             "properties": {
-                "id": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        ".example.TokenReq": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "$ref": "#/definitions/.example.Token"
+                },
+                "field2": {
                     "type": "string"
                 }
             }
