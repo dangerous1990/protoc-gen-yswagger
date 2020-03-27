@@ -16,7 +16,7 @@
 https://github.com/protocolbuffers/protobuf
 ## 2. clone当前项目
 ```
-git clone https://github.com/dangerous1990/protoc-plugins.git
+git clone https://github.com/dangerous1990/protoc-gen-yswagger.git
 ```
 ## 3. 执行init.sh
 进入protoc-plugins项目执行
@@ -46,7 +46,7 @@ message HelloReply{
 ```
 - 使用protoc生成swagger.json
 ```
-protoc -I"${GOPATH}/src/proto" -Iexample example/hello.proto  --swagger_out=example
+protoc -I"${GOPATH}/src/proto" -Iexample example/hello.proto  --yswagger_out=example
 
 ```
 
