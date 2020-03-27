@@ -1,4 +1,4 @@
-module github.com/dangerouslm1990/protoc-gen-yswagger
+module github.com/dangerous1990/protoc-gen-yswagger
 
 require (
 	github.com/bilibili/kratos v0.1.0
