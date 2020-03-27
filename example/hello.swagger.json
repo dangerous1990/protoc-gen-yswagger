@@ -124,6 +124,45 @@
                     "HelloWorld"
                 ]
             }
+        },
+        "/world/:id": {
+            "post": {
+                "summary": "world",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.example.WorldReply"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "schema": {}
+                    }
+                ],
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
         }
     },
     "definitions": {
@@ -169,6 +208,18 @@
                     "type": "string"
                 }
             }
+        },
+        ".example.WorldReply": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        ".example.WorldReq": {
+            "type": "object",
+            "properties": {}
         }
     }
 }

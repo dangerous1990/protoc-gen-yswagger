@@ -13,6 +13,13 @@ service HelloWorld {
             post:"/hello/:id"
         };
     };
+    // world
+    rpc World (WorldReq) returns (WorldReply) {
+        option (google.api.http) = {
+            post:"/world/:id"
+        };
+    };
+
 
     // echo
     rpc Echo (EchoReq) returns (EchoReply) {
@@ -39,10 +46,18 @@ message EchoReq {
 message EchoReply {
     string name = 1;
 }
+
 message HelloReq {
 }
 
-
 message HelloReply {
     string name = 1;
+}
+
+message WorldReq {
+
+}
+
+message WorldReply {
+    int64 id =1 [(gogoproto.jsontag) = 'id,string'];
 }

@@ -8,8 +8,8 @@ cp -r proto "$GOPATH/src/proto"
 
 # install protoc-gen-go
 GIT_TAG="v1.3.0" # change as needed
-echo "go get -d -u github.com/golang/protobuf/protoc-gen-go"
-go get -d -u github.com/golang/protobuf/protoc-gen-go
+echo "go get -u github.com/golang/protobuf/protoc-gen-go"
+go get -u github.com/golang/protobuf/protoc-gen-go
 
 # checkout golang protobuf
 echo "git -C "$(go env GOPATH)"/src/github.com/golang/protobuf checkout $GIT_TAG"

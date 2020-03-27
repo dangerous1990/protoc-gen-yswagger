@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/bilibili/kratos/tool/protobuf/pkg/extensions/gogoproto"
+	"github.com/golang/protobuf/proto"
 	"net/http"
 	"regexp"
 	"strings"
@@ -152,9 +154,14 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 			if p.Key == "-" {
 				continue
 			}
+			generator.GetJSONFieldName(field)
 			schema := t.schemaForField(file, msg, field)
 			if generator.GetFieldRequired(field, t.Reg, msg) {
 				def.Required = append(def.Required, p.Key)
+			}
+			// fix int64 id  =1 [(gogoproto.jsontag) = 'id,string']
+			if strings.Contains(getGogoProtoJsonTag(field),",string"){
+				schema.Type = "string"
 			}
 			p.Value = schema
 			*def.Properties = append(*def.Properties, p)
@@ -167,6 +174,21 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 	out.Name = &name
 	out.Content = &str
 	return out
+}
+
+// getGogoProtoJsonTag
+func getGogoProtoJsonTag(field *descriptor.FieldDescriptorProto) string {
+	if field == nil {
+		return ""
+	}
+	if field.Options != nil {
+		v, err := proto.GetExtension(field.Options, gogoproto.E_Jsontag)
+		if err == nil && v.(*string) != nil {
+			ret := *(v.(*string))
+			return ret
+		}
+	}
+	return field.GetName()
 }
 
 func isContainPathParameters(path string) (bool, string) {
@@ -265,6 +287,7 @@ func (t *swaggerGen) schemaForField(file *descriptor.FileDescriptorProto,
 	}
 	schema.Description = strings.Trim(fComment.Leading, "\n\r ")
 	typ, isArray, format := getFieldSwaggerType(field)
+	typ = typ
 	if !generator.IsScalar(field) {
 		if generator.IsMap(field, t.Reg) {
 			schema.Type = "object"
