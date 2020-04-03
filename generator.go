@@ -2,17 +2,17 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/bilibili/kratos/tool/protobuf/pkg/extensions/gogoproto"
-	"github.com/golang/protobuf/proto"
 	"net/http"
 	"regexp"
 	"strings"
 
-	"github.com/bilibili/kratos/tool/protobuf/pkg/gen"
-	"github.com/bilibili/kratos/tool/protobuf/pkg/generator"
-	"github.com/bilibili/kratos/tool/protobuf/pkg/naming"
-	"github.com/bilibili/kratos/tool/protobuf/pkg/tag"
-	"github.com/bilibili/kratos/tool/protobuf/pkg/typemap"
+	"github.com/go-kratos/kratos/tool/protobuf/pkg/extensions/gogoproto"
+	"github.com/go-kratos/kratos/tool/protobuf/pkg/gen"
+	"github.com/go-kratos/kratos/tool/protobuf/pkg/generator"
+	"github.com/go-kratos/kratos/tool/protobuf/pkg/naming"
+	"github.com/go-kratos/kratos/tool/protobuf/pkg/tag"
+	"github.com/go-kratos/kratos/tool/protobuf/pkg/typemap"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 )
@@ -160,7 +160,7 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 				def.Required = append(def.Required, p.Key)
 			}
 			// fix int64 id  =1 [(gogoproto.jsontag) = 'id,string']
-			if strings.Contains(getGogoProtoJsonTag(field),",string"){
+			if strings.Contains(getGogoProtoJsonTag(field), ",string") {
 				schema.Type = "string"
 			}
 			p.Value = schema
