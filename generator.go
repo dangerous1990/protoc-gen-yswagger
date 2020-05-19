@@ -94,6 +94,9 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 					if !generator.IsScalar(field) {
 						continue
 					}
+					if generator.GetFormOrJSONName(field) == "-" {
+						continue
+					}
 					p := t.getQueryParameter(file, request, field)
 					op.Parameters = append(op.Parameters, p)
 				}
@@ -287,7 +290,6 @@ func (t *swaggerGen) schemaForField(file *descriptor.FileDescriptorProto,
 	}
 	schema.Description = strings.Trim(fComment.Leading, "\n\r ")
 	typ, isArray, format := getFieldSwaggerType(field)
-	typ = typ
 	if !generator.IsScalar(field) {
 		if generator.IsMap(field, t.Reg) {
 			schema.Type = "object"
