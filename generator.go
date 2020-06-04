@@ -89,7 +89,8 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 			request := t.Reg.MessageDefinition(meth.GetInputType())
 			// request cannot represent by simple form
 			isComplexRequest := isComplexRequest(request.Descriptor.Field)
-			if !isComplexRequest && apiInfo.HttpMethod == "GET" {
+			// http get and delete params in query
+			if !isComplexRequest && (apiInfo.HttpMethod == "GET" || apiInfo.HttpMethod == "DELETE") {
 				for _, field := range request.Descriptor.Field {
 					if !generator.IsScalar(field) {
 						continue
