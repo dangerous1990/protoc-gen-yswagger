@@ -16,6 +16,110 @@
         "application/json"
     ],
     "paths": {
+        "/:a/join/:b": {
+            "post": {
+                "summary": "a join b",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.example.JoinabReply"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/.example.JoinabReq"
+                        }
+                    },
+                    {
+                        "name": "a",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "b",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
+        },
+        "/:c/join/:d": {
+            "post": {
+                "summary": "c join d",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.example.JoincdReply"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/.example.JoincdReq"
+                        }
+                    },
+                    {
+                        "name": "c",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "d",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
+        },
         "/echo": {
             "post": {
                 "summary": "echo",
@@ -71,13 +175,48 @@
                         }
                     }
                 },
+                "tags": [
+                    "HelloWorld"
+                ]
+            }
+        },
+        "/query/:id/tree": {
+            "get": {
+                "summary": "query",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "type": "string"
+                                },
+                                "requestID": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "$ref": "#/definitions/.example.QueryReply"
+                                }
+                            }
+                        }
+                    }
+                },
                 "parameters": [
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "type": "string",
-                        "schema": {}
+                        "type": "string"
                     }
                 ],
                 "tags": [
@@ -150,15 +289,6 @@
                         }
                     }
                 },
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "type": "string",
-                        "schema": {}
-                    }
-                ],
                 "tags": [
                     "HelloWorld"
                 ]
@@ -187,6 +317,30 @@
             }
         },
         ".example.HelloReq": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.JoinabReply": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.JoinabReq": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.JoincdReply": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.JoincdReq": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.QueryReply": {
+            "type": "object",
+            "properties": {}
+        },
+        ".example.QueryReq": {
             "type": "object",
             "properties": {}
         },

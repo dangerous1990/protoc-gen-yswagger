@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -42,6 +43,42 @@ func (t *swaggerGen) Generate(in *plugin.CodeGeneratorRequest) *plugin.CodeGener
 		}
 	}
 	return resp
+}
+
+// getPathFieldName  url path parameter
+func getPathFieldName(field *descriptor.FieldDescriptorProto) string {
+	uri := getTagValue(field, "uri") // gin
+	if uri != "" {
+		return uri
+	}
+	return getTagValue(field, "params") // echo
+}
+
+func getTagValue(field *descriptor.FieldDescriptorProto, key string) string {
+	if field == nil {
+		return ""
+	}
+	tags := tag.GetMoreTags(field)
+	if tags != nil {
+		tag := reflect.StructTag(*tags)
+		fName := tag.Get(key)
+		if fName != "" {
+			i := strings.Index(fName, ",")
+			if i != -1 {
+				fName = fName[:i]
+			}
+			return fName
+		}
+	}
+	return ""
+}
+
+func isPathField(field *descriptor.FieldDescriptorProto) bool {
+	return getPathFieldName(field) != ""
+}
+
+func isQueryField(field *descriptor.FieldDescriptorProto) bool {
+	return getTagValue(field, "query") != ""
 }
 
 func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plugin.CodeGeneratorResponse_File {
@@ -89,7 +126,7 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 			request := t.Reg.MessageDefinition(meth.GetInputType())
 			// request cannot represent by simple form
 			isComplexRequest := isComplexRequest(request.Descriptor.Field)
-			// http get and delete params in query
+			// 解析query参数
 			if !isComplexRequest && (apiInfo.HttpMethod == "GET" || apiInfo.HttpMethod == "DELETE") {
 				for _, field := range request.Descriptor.Field {
 					if !generator.IsScalar(field) {
@@ -98,7 +135,10 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 					if generator.GetFormOrJSONName(field) == "-" {
 						continue
 					}
-					p := t.getQueryParameter(file, request, field)
+					if isPathField(field) {
+						continue
+					}
+					p := t.getQueryParameter(request, field)
 					op.Parameters = append(op.Parameters, p)
 				}
 			} else {
@@ -114,16 +154,20 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 					op.Parameters = []swaggerParameterObject{}
 				}
 			}
-			// support path parameters
-			isContainPathParameters, pathField := isContainPathParameters(apiInfo.Path)
+			// 解析path参数
+			isContainPathParameters, pathKeys := isContainPathParameters(apiInfo.Path)
 			if isContainPathParameters {
-				p := swaggerParameterObject{}
-				p.In = "path"
-				p.Required = true
-				p.Name = pathField
-				p.Type = "string"
-				p.Schema = &swaggerSchemaObject{}
-				op.Parameters = append(op.Parameters, p)
+				for _, field := range request.Descriptor.Field {
+					if !generator.IsScalar(field) {
+						continue
+					}
+					// :id != uri: "id"  or :id != params: "id"
+					if !containsElement(pathKeys, getPathFieldName(field)) {
+						continue
+					}
+					p := t.getPathParameter(request, field)
+					op.Parameters = append(op.Parameters, p)
+				}
 			}
 			// response
 			resp := swaggerResponseObject{}
@@ -153,12 +197,18 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 		def := swaggerSchemaObject{}
 		def.Properties = new(swaggerSchemaObjectProperties)
 		def.Description = strings.Trim(msg.Comments.Leading, "\n\r ")
+		// 生成json或者form参数
 		for _, field := range msg.Descriptor.Field {
 			p := keyVal{Key: generator.GetFormOrJSONName(field)}
 			if p.Key == "-" {
 				continue
 			}
-			generator.GetJSONFieldName(field)
+			if isPathField(field) {
+				continue
+			}
+			if isQueryField(field) {
+				continue
+			}
 			schema := t.schemaForField(file, msg, field)
 			if generator.GetFieldRequired(field, t.Reg, msg) {
 				def.Required = append(def.Required, p.Key)
@@ -180,6 +230,15 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 	return out
 }
 
+func containsElement(elements []string, element string) bool {
+	for _, e := range elements {
+		if e == element {
+			return true
+		}
+	}
+	return false
+}
+
 // getGogoProtoJsonTag
 func getGogoProtoJsonTag(field *descriptor.FieldDescriptorProto) string {
 	if field == nil {
@@ -195,16 +254,21 @@ func getGogoProtoJsonTag(field *descriptor.FieldDescriptorProto) string {
 	return field.GetName()
 }
 
-func isContainPathParameters(path string) (bool, string) {
+// isContainPathParameters eg. /api/:id
+func isContainPathParameters(path string) (bool, []string) {
 	segments := strings.Split(path, "/")
+	pathKeys := []string{}
 	for _, v := range segments {
+		// eg. :id
 		if strings.Contains(v, ":") {
-			return true, v[1:]
+			pathKeys = append(pathKeys, v[1:])
 		}
+
 	}
-	return false, ""
+	return len(pathKeys) > 0, pathKeys
 }
 
+// isComplexRequest query|path|form｜json
 func isComplexRequest(fields []*descriptor.FieldDescriptorProto) bool {
 	for _, field := range fields {
 		if !generator.IsScalar(field) {
@@ -233,11 +297,17 @@ func (t *swaggerGen) getOperationByHTTPMethod(httpMethod string, pathItem *swagg
 	return op
 }
 
-func (t *swaggerGen) getQueryParameter(file *descriptor.FileDescriptorProto,
-	input *typemap.MessageDefinition,
-	field *descriptor.FieldDescriptorProto) swaggerParameterObject {
+func getQueryFiledName(field *descriptor.FieldDescriptorProto) string {
+	name := getTagValue(field, "query")
+	if name != "" {
+		return name
+	}
+	return generator.GetFormOrJSONName(field)
+}
+
+func (t *swaggerGen) getQueryParameter(input *typemap.MessageDefinition, field *descriptor.FieldDescriptorProto) swaggerParameterObject {
 	p := swaggerParameterObject{}
-	p.Name = generator.GetFormOrJSONName(field)
+	p.Name = getQueryFiledName(field)
 	fComment, _ := t.Reg.FieldComments(input, field)
 	cleanComment := tag.GetCommentWithoutTag(fComment.Leading)
 
@@ -257,33 +327,22 @@ func (t *swaggerGen) getQueryParameter(file *descriptor.FileDescriptorProto,
 	return p
 }
 
-func (t *swaggerGen) getPathParameter(file *descriptor.FileDescriptorProto,
-	input *typemap.MessageDefinition,
-	field *descriptor.FieldDescriptorProto) swaggerParameterObject {
+func (t *swaggerGen) getPathParameter(input *typemap.MessageDefinition, field *descriptor.FieldDescriptorProto) swaggerParameterObject {
 	p := swaggerParameterObject{}
-	p.Name = generator.GetFormOrJSONName(field)
+	p.Name = getPathFieldName(field)
 	fComment, _ := t.Reg.FieldComments(input, field)
 	cleanComment := tag.GetCommentWithoutTag(fComment.Leading)
 
 	p.Description = strings.Trim(strings.Join(cleanComment, "\n"), "\n\r ")
 	p.In = "path"
-	p.Required = generator.GetFieldRequired(field, t.Reg, input)
-	typ, isArray, format := getFieldSwaggerType(field)
-	if isArray {
-		p.Items = &swaggerItemsObject{}
-		p.Type = "array"
-		p.Items.Type = typ
-		p.Items.Format = format
-	} else {
-		p.Type = typ
-		p.Format = format
-	}
+	p.Required = true // path参数都是必须的
+	typ, _, format := getFieldSwaggerType(field)
+	p.Type = typ
+	p.Format = format
 	return p
 }
 
-func (t *swaggerGen) schemaForField(file *descriptor.FileDescriptorProto,
-	msg *typemap.MessageDefinition,
-	field *descriptor.FieldDescriptorProto) swaggerSchemaObject {
+func (t *swaggerGen) schemaForField(file *descriptor.FileDescriptorProto, msg *typemap.MessageDefinition, field *descriptor.FieldDescriptorProto) swaggerSchemaObject {
 	schema := swaggerSchemaObject{}
 	fComment, err := t.Reg.FieldComments(msg, field)
 	if err != nil {

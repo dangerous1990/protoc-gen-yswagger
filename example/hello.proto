@@ -20,7 +20,6 @@ service HelloWorld {
         };
     };
 
-
     // echo
     rpc Echo (EchoReq) returns (EchoReply) {
         option (google.api.http) = {
@@ -34,7 +33,52 @@ service HelloWorld {
             post:"/token"
         };
     };
+
+    // a join b
+    rpc Joinab (JoinabReq) returns (JoinabReply) {
+        option (google.api.http) = {
+            post:"/:a/join/:b"
+        };
+    };
+    // c join d
+    rpc Joincd (JoincdReq) returns (JoincdReply) {
+        option (google.api.http) = {
+            post:"/:c/join/:d"
+        };
+    };
+
+    // query
+    rpc Query (QueryReq) returns (QueryReply) {
+        option (google.api.http) = {
+            get:"/query/:id/tree"
+        };
+    };
 }
+
+message QueryReq {
+    string id = 1 [(gogoproto.moretags) = 'params:"id"'];
+    string key1 = 2 [(gogoproto.moretags) = 'query:"key"'];
+}
+
+message QueryReply {
+}
+
+message JoinabReq {
+    string a1 = 1 [(gogoproto.moretags) = 'params:"a"'];
+    string b1 = 2 [(gogoproto.moretags) = 'params:"b"'];
+}
+
+message JoinabReply {
+}
+
+message JoincdReq {
+    string c1 = 1 [(gogoproto.moretags) = 'uri:"c"'];
+    string d1 = 2 [(gogoproto.moretags) = 'uri:"d"'];
+}
+
+message JoincdReply {
+}
+
 message TokenReq {
     Token token = 1;
     string field2 = 2;
@@ -59,5 +103,5 @@ message WorldReq {
 }
 
 message WorldReply {
-    int64 id =1 [(gogoproto.jsontag) = 'id,string'];
+    int64 id = 1 [(gogoproto.jsontag) = 'id,string'];
 }

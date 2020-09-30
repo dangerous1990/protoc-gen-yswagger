@@ -5,6 +5,7 @@
   * [2. clone当前项目](#2-clone----)
   * [3. 执行init.sh](#3---initsh)
   * [4. sample](#4-sample)
+  * [5. 支持的http的参数转化](#5--支持的http的参数转化)
 
 # what's this?
 基于bilibili [kratos](https://github.com/bilibili/kratos)的protoc-gen-bswagger修改而来，通过proto文件生成restful的swagger.json文档
@@ -50,3 +51,28 @@ protoc -I"${GOPATH}/src/proto" -Iexample example/hello.proto  --yswagger_out=exa
 
 ```
 
+## 5. 支持的http的参数转化
+
+|        | post | get  | delete | put |
+|  ----  | ---- | ---- |---- | ---- |
+| path  | ✅  | ✅ | ✅ | ✅  |
+| query | ❌  | ✅ | ✅ | ✅  |
+| form  | ✅  | ❌ | ❌ | ❌  |
+| json  | ✅  | ❌ | ❌ | ✅  |
+
+* path参数
+```
+string id = 1 [(gogoproto.moretags) = 'params:"id"'];
+```
+* query参数
+```
+string key1 = 2 [(gogoproto.moretags) = 'query:"key"'];
+```
+* form参数
+```
+string key1 = 2 [(gogoproto.moretags) = 'form:"key"'];
+```
+* json参数
+```
+string key1 = 2 [(gogoproto.jsontag) = 'key'];
+```
