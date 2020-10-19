@@ -51,7 +51,7 @@ func getPathFieldName(field *descriptor.FieldDescriptorProto) string {
 	if uri != "" {
 		return uri
 	}
-	return getTagValue(field, "params") // echo
+	return getTagValue(field, "param") // echo
 }
 
 func getTagValue(field *descriptor.FieldDescriptorProto, key string) string {
