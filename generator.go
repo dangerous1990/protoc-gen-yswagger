@@ -215,7 +215,12 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 			}
 			// fix int64 id  =1 [(gogoproto.jsontag) = 'id,string']
 			if strings.Contains(getGogoProtoJsonTag(field), ",string") {
-				schema.Type = "string"
+				// fix repeated int64 id  =1 [(gogoproto.jsontag) = 'id,string']
+				if schema.Type == "array" && schema.Items != nil {
+					schema.Items.Type = "string"
+				} else {
+					schema.Type = "string"
+				}
 			}
 			p.Value = schema
 			*def.Properties = append(*def.Properties, p)
