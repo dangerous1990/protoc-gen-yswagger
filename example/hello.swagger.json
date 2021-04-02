@@ -31,7 +31,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -49,18 +49,6 @@
                         "schema": {
                             "$ref": "#/definitions/.example.JoinabReq"
                         }
-                    },
-                    {
-                        "name": "a",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "b",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
                     }
                 ],
                 "tags": [
@@ -83,7 +71,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -135,7 +123,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -165,7 +153,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -195,7 +183,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -207,15 +195,15 @@
                 },
                 "parameters": [
                     {
-                        "name": "key",
+                        "name": "id",
                         "in": "query",
                         "required": false,
                         "type": "string"
                     },
                     {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
+                        "name": "key",
+                        "in": "query",
+                        "required": false,
                         "type": "string"
                     }
                 ],
@@ -239,7 +227,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -279,7 +267,7 @@
                                 "message": {
                                     "type": "string"
                                 },
-                                "requestID": {
+                                "request_id": {
                                     "type": "string"
                                 },
                                 "data": {
@@ -326,7 +314,14 @@
         },
         ".example.JoinabReq": {
             "type": "object",
-            "properties": {}
+            "properties": {
+                "a1": {
+                    "type": "string"
+                },
+                "b1": {
+                    "type": "string"
+                }
+            }
         },
         ".example.JoincdReply": {
             "type": "object",
@@ -342,7 +337,11 @@
         },
         ".example.QueryReq": {
             "type": "object",
-            "properties": {}
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
         },
         ".example.Token": {
             "type": "object",

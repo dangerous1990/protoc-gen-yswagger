@@ -48,6 +48,8 @@ message HelloReply{
 - 使用protoc生成swagger.json
 ```
 protoc -I"${GOPATH}/src/proto" -Iexample example/hello.proto  --yswagger_out=example
+# 支持覆盖requestID
+protoc -I"${GOPATH}/src/proto" -Iexample example/hello.proto  --yswagger_out=example --yswagger_opt='requestID=request_id'
 
 ```
 

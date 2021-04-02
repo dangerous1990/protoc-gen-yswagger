@@ -32,12 +32,16 @@ func NewSwaggerGenerator() *swaggerGen {
 
 func (t *swaggerGen) Generate(in *plugin.CodeGeneratorRequest) *plugin.CodeGeneratorResponse {
 	t.Setup(in)
+	requestID := "requestID"
+	if in.Parameter != nil {
+		_, requestID = parseKV(*in.Parameter)
+	}
 	resp := &plugin.CodeGeneratorResponse{}
 	for _, f := range t.GenFiles {
 		if len(f.Service) == 0 {
 			continue
 		}
-		respFile := t.generateSwagger(f)
+		respFile := t.generateSwagger(f, requestID)
 		if respFile != nil {
 			resp.File = append(resp.File, respFile)
 		}
@@ -81,7 +85,17 @@ func isQueryField(field *descriptor.FieldDescriptorProto) bool {
 	return getTagValue(field, "query") != ""
 }
 
-func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plugin.CodeGeneratorResponse_File {
+func parseKV(str string) (k, v string) {
+	if str == "" {
+		return "", ""
+	}
+	if strings.Index(str, "=") > 0 {
+		return strings.Split(str, "=")[0], strings.Split(str, "=")[1]
+	}
+	return "", ""
+}
+
+func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto, requestIDStr string) *plugin.CodeGeneratorResponse_File {
 	var pkg = file.GetPackage()
 	r := regexp.MustCompile("v(\\d+)$")
 	strs := r.FindStringSubmatch(pkg)
@@ -181,7 +195,7 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto) *plug
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
 			p = keyVal{Key: "message", Value: &schemaCore{Type: "string"}}
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
-			p = keyVal{Key: "requestID", Value: &schemaCore{Type: "string"}}
+			p = keyVal{Key: requestIDStr, Value: &schemaCore{Type: "string"}}
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
 			p = keyVal{Key: "data", Value: schemaCore{Ref: "#/definitions/" + meth.GetOutputType()}}
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
