@@ -30,22 +30,42 @@ func NewSwaggerGenerator() *swaggerGen {
 	return &swaggerGen{}
 }
 
-func (t *swaggerGen) Generate(in *plugin.CodeGeneratorRequest) *plugin.CodeGeneratorResponse {
-	t.Setup(in)
-	requestID := "requestID"
-	if in.Parameter != nil {
-		_, requestID = parseKV(*in.Parameter)
+type BasicParam struct {
+	generator.ParamsBase
+	m map[string]string
+}
+
+func (b *BasicParam) GetBase() *generator.ParamsBase {
+	return &b.ParamsBase
+}
+func (b *BasicParam) SetParam(key string, value string) error {
+	if b.m == nil {
+		b.m = make(map[string]string)
 	}
+	b.m[key] = value
+	return nil
+}
+func (b *BasicParam) GetParam(key string) (val string, ok bool) {
+	val, ok = b.m[key]
+	return
+}
+
+func (t *swaggerGen) Generate(in *plugin.CodeGeneratorRequest) *plugin.CodeGeneratorResponse {
+	params := &BasicParam{}
+	t.Setup(in, params)
+
 	resp := &plugin.CodeGeneratorResponse{}
+
 	for _, f := range t.GenFiles {
 		if len(f.Service) == 0 {
 			continue
 		}
-		respFile := t.generateSwagger(f, requestID)
+		respFile := t.generateSwagger(f, params)
 		if respFile != nil {
 			resp.File = append(resp.File, respFile)
 		}
 	}
+
 	return resp
 }
 
@@ -85,20 +105,12 @@ func isQueryField(field *descriptor.FieldDescriptorProto) bool {
 	return getTagValue(field, "query") != ""
 }
 
-func parseKV(str string) (k, v string) {
-	if str == "" {
-		return "", ""
-	}
-	if strings.Index(str, "=") > 0 {
-		return strings.Split(str, "=")[0], strings.Split(str, "=")[1]
-	}
-	return "", ""
-}
+var versionRexp = regexp.MustCompile(`v(\\d+)$`)
 
-func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto, requestIDStr string) *plugin.CodeGeneratorResponse_File {
+func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto, basicParam *BasicParam) *plugin.CodeGeneratorResponse_File {
 	var pkg = file.GetPackage()
-	r := regexp.MustCompile("v(\\d+)$")
-	strs := r.FindStringSubmatch(pkg)
+
+	strs := versionRexp.FindStringSubmatch(pkg)
 	var vStr string
 	if len(strs) >= 2 {
 		vStr = strs[1]
@@ -195,7 +207,13 @@ func (t *swaggerGen) generateSwagger(file *descriptor.FileDescriptorProto, reque
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
 			p = keyVal{Key: "message", Value: &schemaCore{Type: "string"}}
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
-			p = keyVal{Key: requestIDStr, Value: &schemaCore{Type: "string"}}
+
+			if requestID, ok := basicParam.GetParam("requestID"); ok {
+				p = keyVal{Key: requestID, Value: &schemaCore{Type: "string"}}
+			} else {
+				p = keyVal{Key: "requestID", Value: &schemaCore{Type: "string"}}
+			}
+
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)
 			p = keyVal{Key: "data", Value: schemaCore{Ref: "#/definitions/" + meth.GetOutputType()}}
 			*resp.Schema.Properties = append(*resp.Schema.Properties, p)

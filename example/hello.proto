@@ -53,6 +53,9 @@ service HelloWorld {
             get:"/query/:id/tree"
         };
     };
+
+    // Query2 with out http not generate
+    rpc Query2 (QueryReq) returns (QueryReply) ;
 }
 
 message QueryReq {
